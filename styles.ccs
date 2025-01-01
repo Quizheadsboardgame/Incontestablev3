@@ -1,0 +1,46 @@
+let timer; // Global variable to hold the timer interval
+
+function generateQuestion(category) {
+    // Hide the categories and show the question and timer
+    document.getElementById("categories").style.display = "none";
+    document.getElementById("question").style.display = "block";
+    document.getElementById("timer").style.display = "block";
+    document.getElementById("backButton").style.display = "block";
+
+    // Get a random question from the selected category
+    const questionList = categories[category];
+    const randomQuestion = questionList[Math.floor(Math.random() * questionList.length)];
+    document.getElementById("question").textContent = `Category: ${category} - ${randomQuestion}`;
+
+    // Clear any existing timer
+    clearInterval(timer);
+
+    // Set the timer to 2 minutes
+    let timeLeft = 120; // 2 minutes
+    const timerElement = document.getElementById("timer");
+
+    timer = setInterval(function () {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        // Update the timer display
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+        // Flash the timer in the last 10 seconds
+        if (timeLeft <= 10) {
+            timerElement.classList.add("flashing");
+        } else {
+            timerElement.classList.remove("flashing");
+        }
+
+        // Decrement the time
+        timeLeft--;
+
+        // Stop the timer when it reaches zero
+        if (timeLeft < 0) {
+            clearInterval(timer);
+            timerElement.textContent = "Time's up!";
+            timerElement.classList.remove("flashing");
+        }
+    }, 1000);
+}
