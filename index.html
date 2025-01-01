@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INCONTESTABLE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #add8e6, #87ceeb);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: black;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: black;
+            color: white;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        #question, #categories {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #timer {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .flashing {
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% {
+                color: red;
+            }
+            50% {
+                color: black;
+            }
+        }
+
+        #rules {
+            margin-top: 20px;
+            font-size: 16px;
+            color: black;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>INCONTESTABLE</h1>
+    <div id="categories"></div>
+    <div id="question" style="display: none;"></div>
+    <div id="timer" style="display: none;"></div>
+    <button id="backButton" style="display: none;" onclick="showCategories()">Back to Categories</button>
+    <div id="rules">
+        <h2>Rules:</h2>
+        <ol>
+            <li>Longest, unique and correct answer wins</li>
+            <li>You can contest an answer but if your contest is incorrect you are disqualified on the round</li>
+            <li>50 extra points (excluding multipliers) for the longest answer at the end of the game</li>
+            <li>150 extra points (excluding multipliers) for the shortest answer on the board</li>
+            <li>No repeat answers throughout can play</li>
+            <li>2 mins to answer each question</li>
+            <li>Youngest player picks first category</li>
+            <li>Winner of last round picks the next category</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    const categories = {
+        "Sport": [
+            "Name a sport played on a field",
+            "Name a sport that uses a ball",
+            "Name a sport in the Olympics",
+            "Name a sport where players wear helmets",
+            "Name a water-based sport",
+            "Name a sport that involves running",
+            "Name a team sport",
+            "Name a winter sport",
+            "Name a sport played in the summer",
+            "Name a sport that requires a racket",
+            "Name a sport played with a net",
+            "Name a sport with a professional league",
+            "Name a sport popular in Europe",
+            "Name a sport popular in the USA",
+            "Name a sport that requires a court",
+            "Name a sport played individually",
+            "Name a combat sport",
+            "Name a sport played with sticks",
+            "Name a sport where animals are involved",
+            "Name a sport that requires balance",
+            "Name a sport that involves flying equipment",
+            "Name a sport that requires a pool",
+            "Name a sport where points are scored by goals",
+            "Name a sport involving bikes",
+            "Name a sport played on ice"
+        ],
+        "Movies": [
+            "Name a movie that won an Oscar",
+            "Name an animated movie",
+            "Name a movie directed by Steven Spielberg",
+            "Name a superhero movie",
+            "Name a romantic comedy",
+            "Name a movie based on a true story",
+            "Name a movie set in space",
+            "Name a horror movie",
+            "Name a movie released in the 2000s",
+            "Name a movie with a famous soundtrack",
+            "Name a comedy movie",
+            "Name a movie set during World War II",
+            "Name a movie with a famous villain",
+            "Name a movie about sports",
+            "Name a movie starring Meryl Streep",
+            "Name a movie based on a book",
+            "Name a fantasy movie",
+            "Name a Disney movie",
+            "Name a movie with an animal protagonist",
+            "Name a movie with a twist ending",
+            "Name a science fiction movie",
+            "Name a drama movie",
+            "Name a movie about friendship",
+            "Name a movie with a strong female lead",
+            "Name a musical movie"
+        ],
+        "Music": [
+            "Name a famous singer",
+            "Name a rock band",
+            "Name a pop star",
+            "Name a musical instrument",
+            "Name a famous composer",
+            "Name a genre of music",
+            "Name a classical piece",
+            "Name a song with the word 'love' in the title",
+            "Name an album that won a Grammy",
+            "Name a jazz musician",
+            "Name a famous guitarist",
+            "Name a song from the 1980s",
+            "Name a famous music festival",
+            "Name a band from the 1990s",
+            "Name a famous drummer",
+            "Name a song with a color in the title",
+            "Name a song with a number in the title",
+            "Name a duet song",
+            "Name a song by The Beatles",
+            "Name a popular Christmas song",
+            "Name a soundtrack song",
+            "Name a song that won an Oscar",
+            "Name a song about heartbreak",
+            "Name a dance song",
+            "Name a famous opera singer"
+        ],
+        "Tv": [
+            "Name a long-running TV show",
+            "Name a sitcom",
+            "Name a crime drama",
+            "Name a TV show set in New York City",
+            "Name a TV show with an animated family",
+            "Name a reality TV show",
+            "Name a cooking show",
+            "Name a game show",
+            "Name a TV show with superheroes",
+            "Name a TV show set in a hospital",
+            "Name a science fiction TV show",
+            "Name a TV show that won an Emmy",
+            "Name a Netflix original series",
+            "Name a kids' TV show",
+            "Name a TV show based on a book",
+            "Name a TV show about a detective",
+            "Name a fantasy TV show",
+            "Name a TV show with a famous theme song",
+            "Name a TV show about high school",
+            "Name a TV show that ended in the 2000s",
+            "Name a sitcom from the 90s",
+            "Name a historical drama",
+            "Name a TV show set in the future",
+            "Name a soap opera",
+            "Name a TV show with a talking animal"
+        ],
+        "General knowledge": [
+            "Name a capital city",
+            "Name a type of tree",
+            "Name a type of bird",
+            "Name a color",
+            "Name a type of weather",
+            "Name a planet in our solar system",
+            "Name an element from the periodic table",
+            "Name a famous scientist",
+            "Name a famous historical figure",
+            "Name a type of transportation",
+            "Name a type of animal",
+            "Name a body of water",
+            "Name a type of food",
+            "Name a type of drink",
+            "Name a type of flower",
+            "Name a mountain range",
+            "Name a desert",
+            "Name a country",
+            "Name a language",
+            "Name a type of building",
+            "Name a continent",
+            "Name a famous landmark",
+            "Name a type of clothing",
+            "Name a famous book",
+            "Name a type of currency"
+        ],
+        // Add 25 meaningful questions for each remaining category
+        "Starting with a letter": [
+            "Name a fruit starting with 'A'",
+            "Name an animal starting with 'B'",
+            "Name a city starting with 'C'",
+            "Name a country starting with 'D'",
+            "Name a famous person starting with 'E'",
+            // Add more questions...
+        ],
+        "Musicals and the arts": [
+            "Name a famous painting",
+            "Name a famous opera",
+            "Name a musical instrument",
+            "Name a famous musical",
+            "Name an art museum",
+            // Add more questions...
+        ],
+        "History": [
+            "Name a US President",
+            "Name an ancient civilization",
+            "Name a World War II battle",
+            "Name a historical event in the 20th century",
+            "Name a famous revolutionary",
+            // Add more questions...
+        ],
+        "The 90s": [
+            "Name a 90s boy band",
+            "Name a 90s TV show",
+            "Name a 90s movie",
+            "Name a 90s fashion trend",
+            "Name a 90s video game",
+            // Add more questions...
+        ],
+        "The Simpsons": [
+            "Name a Simpsons character",
+            "Name a Springfield location",
+            "Name a Simpsons episode",
+            "Name a guest star on The Simpsons",
+            "Name a Simpsons family pet",
+            // Add more questions...
+        ]
+    };
+
+    function getRandomCategories() {
+        const keys = Object.keys(categories);
+        const randomCategories = [];
+        while (randomCategories.length < 3) {
+            const randomCategory = keys[Math.floor(Math.random() * keys.length)];
+            if (!randomCategories.includes(randomCategory)) {
+                randomCategories.push(randomCategory);
+            }
+        }
+        return randomCategories;
+    }
+
+    function showCategories() {
+        document.getElementById("categories").style.display = "block";
+        document.getElementById("question").style.display = "none";
+        document.getElementById("timer").style.display = "none";
+        document.getElementById("backButton").style.display = "none";
+
+        const categoriesElement = document.getElementById("categories");
+        categoriesElement.innerHTML = "";
+
+        const randomCategories = getRandomCategories();
+        randomCategories.forEach(category => {
+            const button = document.createElement("button");
+            button.textContent = category;
+            button.onclick = () => generateQuestion(category);
+            categoriesElement.appendChild(button);
+        });
+    }
+
+    function generateQuestion(category) {
+        document.getElementById("categories").style.display = "none";
+        document.getElementById("question").style.display = "block";
+        document.getElementById("timer").style.display = "block";
+        document.getElementById("backButton").style.display = "block";
+
+        const questionList = categories[category];
+        const randomQuestion = questionList[Math.floor(Math.random() * questionList.length)];
+        document.getElementById("question").textContent = `Category: ${category} - ${randomQuestion}`;
+
+        let timeLeft = 120; // 2 minutes
+        const timerElement = document.getElementById("timer");
+        const timer = setInterval(function () {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            if (timeLeft <= 10) {
+                timerElement.classList.add("flashing");
+            } else {
+                timerElement.classList.remove("flashing");
+            }
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(timer);
+                timerElement.textContent = "Time's up!";
+                timerElement.classList.remove("flashing");
+            }
+        }, 1000);
+    }
+
+    showCategories();
+</script>
+
+</body>
+</html>
